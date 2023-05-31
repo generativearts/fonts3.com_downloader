@@ -37,13 +37,22 @@ def get_font_page_links(url):
         font_links.append(urllib.parse.urljoin(base_url, href))
     return font_links
 
+def pages_total(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    if soup.find_all("div", class_="list_page"):
+        pages_num = soup.find("div", class_="list_page").text.split('/')[-1]
+        return int(pages_num)
 
 def download_fonts_from_url(url):
-    font_links = get_font_page_links(url)
-    for font_page_link in font_links:
-        font_link = get_font_link(font_page_link)
-        print("Downloading:", font_link)
-        download_font(font_link)
+    pages_num = pages_total(url)
+    for i in range(1,pages_num+1):
+        font_links = get_font_page_links(url + str(i))
+        print(url + str(i))
+        for font_page_link in font_links:
+            font_link = get_font_link(font_page_link)
+            print("Downloading:", font_link)
+            download_font(font_link)
 
 # Посилання на сторінку зі шрифтами
 url = "http://fonts3.com/search/?/HelveticaNeueLTW1G/"
